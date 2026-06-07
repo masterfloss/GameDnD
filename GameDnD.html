@@ -1,0 +1,868 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>⚔️ D&D RPG - Hero's Journey: Recruit & Conquer ⚔️</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Arial', system-ui;
+            background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 100%);
+            color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .game-container {
+            max-width: 1100px;
+            width: 100%;
+            background: rgba(20, 25, 40, 0.85);
+            backdrop-filter: blur(2px);
+            border-radius: 28px;
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 215, 0, 0.15);
+            transition: all 0.2s;
+        }
+
+        h1 {
+            font-size: 1.9rem;
+            text-align: center;
+            margin: 0 0 20px 0;
+            background: linear-gradient(135deg, #ffd966, #e6b422);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .start-panel {
+            background: #1e2538;
+            border-radius: 24px;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid #ffd96655;
+        }
+
+        select, button {
+            background: #2a3448;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+            margin: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        select {
+            background: #1e2a3a;
+            border: 1px solid #ffd966;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+            background: #3a4460;
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .restart-btn {
+            background: #e67e22;
+            border-bottom: 2px solid #f39c12;
+        }
+
+        .restart-btn:hover {
+            background: #f39c12;
+        }
+
+        .game-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            flex: 1;
+            min-width: 260px;
+            background: #1a1f2ecc;
+            backdrop-filter: blur(4px);
+            border-radius: 24px;
+            padding: 18px;
+            border: 1px solid #ffd96644;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            border-left: 4px solid #ffd966;
+            padding-left: 12px;
+            color: #ffdf8c;
+        }
+
+        .stat-block {
+            margin: 12px 0;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+
+        .bar {
+            height: 12px;
+            background: #2c2f3e;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 6px 0;
+        }
+
+        .fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.2s ease;
+        }
+
+        .fill.hp { background: #e35f5f; box-shadow: 0 0 4px #ff6a6a;}
+        .fill.mana { background: #5f9eff; box-shadow: 0 0 4px #5f9eff;}
+        .fill.gold { background: #ffc857; box-shadow: 0 0 4px #ffcc66;}
+        .fill.power { background: #bf6ee0; box-shadow: 0 0 4px #c97eff;}
+        .fill.progress { background: #3bc98a; box-shadow: 0 0 4px #4fe39c;}
+
+        .allies-list {
+            max-height: 160px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+            background: #0f111ccc;
+            border-radius: 16px;
+            padding: 8px;
+            margin-top: 8px;
+        }
+
+        .ally-badge {
+            background: #2a2f44;
+            margin: 5px 0;
+            padding: 6px 10px;
+            border-radius: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+        }
+
+        .enemy-card {
+            background: linear-gradient(135deg, #2a1a2a, #1f1428);
+            border-left: 4px solid #e35f5f;
+            padding: 16px;
+            border-radius: 20px;
+            margin-top: 8px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .enemy-image {
+            width: 80px;
+            height: 80px;
+            background: #0f0e1a;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            box-shadow: 0 0 0 3px #ffd96655, 0 8px 20px black;
+            transition: transform 0.2s;
+        }
+
+        .enemy-image:hover {
+            transform: scale(1.05);
+        }
+
+        .enemy-stats {
+            flex: 1;
+        }
+
+        .cost-badge {
+            background: #ffc85722;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            margin-top: 8px;
+            font-weight: bold;
+            color: #ffdd99;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .action-buttons button {
+            background: #2c2f44;
+            padding: 10px 20px;
+            min-width: 90px;
+            font-weight: bold;
+            border-bottom: 2px solid #ffd966;
+        }
+
+        .log {
+            background: #0b0e16;
+            border-radius: 20px;
+            height: 200px;
+            overflow-y: auto;
+            padding: 14px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            border: 1px solid #2e3a55;
+            margin-top: 12px;
+        }
+
+        .log p {
+            margin: 4px 0;
+            border-left: 3px solid #ffd966;
+            padding-left: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .game-over-overlay {
+            text-align: center;
+            margin-top: 15px;
+            padding: 15px;
+            background: #2a1a2acc;
+            border-radius: 60px;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 #e67e2266; }
+            70% { box-shadow: 0 0 0 10px rgba(230, 126, 34, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(230, 126, 34, 0); }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1e2a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ffd966;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 700px) {
+            .game-panel {
+                flex-direction: column;
+            }
+            .action-buttons button {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+            .enemy-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            .enemy-image {
+                width: 70px;
+                height: 70px;
+                font-size: 2.5rem;
+                margin: 0 auto;
+            }
+        }
+
+        .crit-text {
+            color: #ffaa66;
+            font-weight: bold;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            transform: none;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1>⚔️ D&D: RECRUIT & CONQUER ⚔️</h1>
+
+    <!-- START SECTION -->
+    <div id="startScreen">
+        <div class="start-panel">
+            <h3>⚔️ Choose Your Class ⚔️</h3>
+            <select id="classSelect">
+                <option value="Warrior">🛡️ Warrior (Tank & Power)</option>
+                <option value="Rogue">🗡️ Rogue (Critical Strikes)</option>
+                <option value="Mage">🔮 Mage (Arcane Blast)</option>
+            </select>
+            <br>
+            <button id="startGameBtn">✨ Begin Adventure ✨</button>
+            <p style="font-size:12px; margin-top:20px;">⭐ Defeat enemies → earn gold & progress ⭐<br>💰 Recruit foes as allies using their cost! 💰</p>
+        </div>
+    </div>
+
+    <!-- MAIN GAME UI -->
+    <div id="gameInterface" class="hidden">
+        <div class="game-panel">
+            <!-- Player & Allies -->
+            <div class="card">
+                <h3>🌟 HERO</h3>
+                <div id="playerStatsArea"></div>
+                <h3>⚔️ ALLIES (SQUAD)</h3>
+                <div id="alliesContainer" class="allies-list">— No allies yet —</div>
+            </div>
+
+            <!-- Encounter with Enemy IMAGE -->
+            <div class="card">
+                <h3>🐉 CURRENT ENEMY</h3>
+                <div id="enemyArea"></div>
+                <div id="recruitMessage" style="margin-top: 12px;"></div>
+            </div>
+        </div>
+
+        <!-- Combat Buttons -->
+        <div class="action-buttons">
+            <button id="btnAttack">⚔️ ATTACK</button>
+            <button id="btnSkill">✨ SKILL</button>
+            <button id="btnHeal">💚 HEAL</button>
+            <button id="btnRecruit">🤝 RECRUIT</button>
+            <button id="btnNext">➡️ NEXT FOE</button>
+        </div>
+
+        <!-- Event Log -->
+        <div class="log" id="combatLog"></div>
+
+        <!-- Restart Button Container (appears at game over or win) -->
+        <div id="restartContainer" class="hidden game-over-overlay">
+            <button id="restartButton" class="restart-btn">🔄 RESTART ADVENTURE 🔄</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // -------------------------------
+    // 1. ENEMY IMAGE MAP & dynamic visuals
+    // -------------------------------
+    const enemyArtMap = {
+        "Goblin Scrapper": { icon: "👺", color: "#6a994e" },
+        "Orc Marauder": { icon: "👹", color: "#bc4a2c" },
+        "Dark Elf Ranger": { icon: "🧝", color: "#6c91b2" },
+        "Skeleton Knight": { icon: "💀", color: "#b0a0b0" },
+        "Fire Elemental": { icon: "🔥", color: "#e25822" },
+        "Mercenary Captain": { icon: "⚔️", color: "#cdb28b" },
+        "Troll Brute": { icon: "👾", color: "#5e8c5a" },
+        "Shadow Wraith": { icon: "👻", color: "#8a6e9c" }
+    };
+
+    function getEnemyArt(enemyName) {
+        for (let key in enemyArtMap) {
+            if (enemyName.includes(key.split(" ")[0]) || enemyName === key) {
+                return enemyArtMap[key];
+            }
+        }
+        return { icon: "🐲", color: "#c97e5a" };
+    }
+
+    // -------------------------------
+    // 2. CHARACTER BASE CLASS
+    // -------------------------------
+    class Character {
+        constructor(name, maxHp, attackPower) {
+            this.name = name;
+            this.maxHp = maxHp;
+            this.hp = maxHp;
+            this.atk = attackPower;
+        }
+
+        isAlive() { return this.hp > 0; }
+
+        takeDamage(amount) {
+            this.hp = Math.max(0, this.hp - amount);
+            return amount;
+        }
+
+        receiveHeal(amount) {
+            this.hp = Math.min(this.maxHp, this.hp + amount);
+        }
+
+        getHealthPercent() { return (this.hp / this.maxHp) * 100; }
+    }
+
+    // -------------------------------
+    // 3. PLAYER / ALLY UNIT (with mana)
+    // -------------------------------
+    class PlayerUnit extends Character {
+        constructor(className, customName = null) {
+            const stats = {
+                Warrior: { hp: 150, atk: 18, mana: 100 },
+                Rogue: { hp: 110, atk: 22, mana: 100 },
+                Mage: { hp: 90, atk: 15, mana: 100 }
+            };
+            const selected = stats[className] || stats.Warrior;
+            super(customName || className, selected.hp, selected.atk);
+            this.classType = className;
+            this.mana = selected.mana;
+            this.maxMana = 100;
+        }
+
+        basicAttack(target, logCallback) {
+            let totalDamage = this.atk + Math.floor(Math.random() * 12) + 1;
+            // Rogue extra critical flavor (but still balanced)
+            let isCrit = false;
+            if (this.classType === "Rogue" && Math.random() < 0.2) {
+                totalDamage = Math.floor(totalDamage * 1.5);
+                isCrit = true;
+            }
+            target.takeDamage(totalDamage);
+            if (isCrit) {
+                logCallback(`🗡️✨ ${this.name} lands a DEADLY CRITICAL! ${totalDamage} damage to ${target.name}! ✨🗡️`);
+            } else {
+                logCallback(`${this.name} ⚡ strikes ${target.name} for ${totalDamage} damage!`);
+            }
+            return totalDamage;
+        }
+
+        specialSkill(target, logCallback) {
+            if (this.mana < 15) {
+                logCallback(`❌ ${this.name} lacks mana! (${this.mana}/15 required)`);
+                return false;
+            }
+            this.mana -= 15;
+            let damage = 0;
+            switch (this.classType) {
+                case "Warrior":
+                    damage = this.atk * 2 + Math.floor(Math.random() * 12);
+                    logCallback(`💥 ${this.name} uses MIGHTY SLAM! ${damage} brutal damage!`);
+                    break;
+                case "Rogue":
+                    damage = this.atk * 3 + Math.floor(Math.random() * 14);
+                    logCallback(`🗡️ ${this.name} backstabs for ${damage} critical!`);
+                    break;
+                case "Mage":
+                    damage = this.atk * 4 + Math.floor(Math.random() * 16);
+                    logCallback(`🔮 ${this.name} casts FIREBALL! ${damage} arcane blast!`);
+                    break;
+                default:
+                    damage = this.atk * 2;
+                    logCallback(`✨ ${this.name} uses special strike! ${damage} damage!`);
+            }
+            target.takeDamage(damage);
+            return true;
+        }
+
+        selfHeal(logCallback) {
+            const healAmount = 28;
+            this.receiveHeal(healAmount);
+            logCallback(`💚 ${this.name} recovers ${healAmount} HP! (${this.hp}/${this.maxHp})`);
+        }
+
+        regenMana(amount = 5) {
+            this.mana = Math.min(this.maxMana, this.mana + amount);
+        }
+        
+        fullRestore() {
+            this.hp = this.maxHp;
+            this.mana = this.maxMana;
+        }
+    }
+
+    // -------------------------------
+    // 4. ENEMY with image & recruit cost
+    // -------------------------------
+    class Enemy extends Character {
+        constructor(name, hp, atk, cost) {
+            super(name, hp, atk);
+            this.cost = cost;
+            const art = getEnemyArt(name);
+            this.icon = art.icon;
+            this.iconColor = art.color;
+        }
+
+        enemyAction(targetsList, logCallback) {
+            const aliveTargets = targetsList.filter(t => t.isAlive());
+            if (aliveTargets.length === 0) return;
+            const randomTarget = aliveTargets[Math.floor(Math.random() * aliveTargets.length)];
+            const damageDealt = this.atk + Math.floor(Math.random() * 8);
+            randomTarget.takeDamage(damageDealt);
+            logCallback(`🐉 ${this.name} attacks ${randomTarget.name} for ${damageDealt} damage!`);
+        }
+
+        getArtHTML() {
+            return `<div class="enemy-image" style="background: #00000066; text-shadow: 0 0 6px currentColor; color: ${this.iconColor};">
+                        <span style="font-size:3rem;">${this.icon}</span>
+                    </div>`;
+        }
+    }
+
+    // -------------------------------
+    // 5. MAIN GAME CONTROLLER (enhanced restart & win condition)
+    // -------------------------------
+    class DungeonGame {
+        constructor() {
+            this.player = null;
+            this.allies = [];
+            this.currentEnemy = null;
+            this.gold = 120;
+            this.progress = 0;
+            this.gameActive = false;
+
+            this.startScreen = document.getElementById("startScreen");
+            this.gameInterface = document.getElementById("gameInterface");
+            this.classSelect = document.getElementById("classSelect");
+            this.startBtn = document.getElementById("startGameBtn");
+            this.logContainer = document.getElementById("combatLog");
+            this.restartContainer = document.getElementById("restartContainer");
+            this.restartBtn = document.getElementById("restartButton");
+
+            this.attackBtn = document.getElementById("btnAttack");
+            this.skillBtn = document.getElementById("btnSkill");
+            this.healBtn = document.getElementById("btnHeal");
+            this.recruitBtn = document.getElementById("btnRecruit");
+            this.nextBtn = document.getElementById("btnNext");
+
+            this.playerStatsDiv = document.getElementById("playerStatsArea");
+            this.alliesDiv = document.getElementById("alliesContainer");
+            this.enemyDiv = document.getElementById("enemyArea");
+
+            this.bindEvents();
+        }
+
+        bindEvents() {
+            this.startBtn.onclick = () => this.startNewGame();
+            this.restartBtn.onclick = () => this.restartGame();
+            this.attackBtn.onclick = () => this.playerAttack();
+            this.skillBtn.onclick = () => this.playerSkill();
+            this.healBtn.onclick = () => this.playerHeal();
+            this.recruitBtn.onclick = () => this.attemptRecruit();
+            this.nextBtn.onclick = () => this.nextEncounter();
+        }
+
+        addLog(message) {
+            const logEntry = document.createElement("p");
+            logEntry.innerHTML = `⚡ ${message}`;
+            this.logContainer.appendChild(logEntry);
+            logEntry.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            this.logContainer.scrollTop = this.logContainer.scrollHeight;
+        }
+
+        clearLog() {
+            this.logContainer.innerHTML = "";
+            this.addLog("✨ Adventure begins! Defeat enemies to earn gold & progress.");
+        }
+
+        // FULL RESTART with hard reset
+        restartGame() {
+            this.gameActive = false;
+            this.allies = [];
+            this.gold = 120;
+            this.progress = 0;
+            this.currentEnemy = null;
+            
+            const selectedClass = this.classSelect.value;
+            this.player = new PlayerUnit(selectedClass, "Hero");
+            this.spawnRandomEnemy();
+            this.gameActive = true;
+            
+            this.restartContainer.classList.add("hidden");
+            this.clearLog();
+            this.addLog(`🔄 GAME RESTARTED! 🔄`);
+            this.addLog(`🛡️ ${this.player.name} the ${this.player.classType} returns to battle!`);
+            this.addLog(`💰 Starting gold: ${this.gold} | Recruit enemies by paying their cost!`);
+            
+            this.updateAllUI();
+        }
+
+        startNewGame() {
+            const selectedClass = this.classSelect.value;
+            this.player = new PlayerUnit(selectedClass, "Hero");
+            this.allies = [];
+            this.gold = 120;
+            this.progress = 0;
+            this.gameActive = true;
+            this.spawnRandomEnemy();
+
+            this.startScreen.classList.add("hidden");
+            this.gameInterface.classList.remove("hidden");
+            this.restartContainer.classList.add("hidden");
+            this.clearLog();
+            this.addLog(`🛡️ ${this.player.name} the ${this.player.classType} joins the fight!`);
+            this.addLog(`💰 Starting gold: ${this.gold} | Recruit enemies by paying their cost!`);
+            this.updateAllUI();
+        }
+
+        spawnRandomEnemy() {
+            const enemyPool = [
+                { name: "Goblin Scrapper", hp: 42, atk: 8, cost: 30 },
+                { name: "Orc Marauder", hp: 85, atk: 13, cost: 60 },
+                { name: "Dark Elf Ranger", hp: 65, atk: 11, cost: 50 },
+                { name: "Skeleton Knight", hp: 58, atk: 12, cost: 45 },
+                { name: "Fire Elemental", hp: 70, atk: 15, cost: 70 },
+                { name: "Mercenary Captain", hp: 78, atk: 10, cost: 55 },
+                { name: "Troll Brute", hp: 95, atk: 14, cost: 75 },
+                { name: "Shadow Wraith", hp: 62, atk: 16, cost: 65 }
+            ];
+            const roll = Math.floor(Math.random() * enemyPool.length);
+            const e = enemyPool[roll];
+            this.currentEnemy = new Enemy(e.name, e.hp, e.atk, e.cost);
+            this.addLog(`⚠️ ${this.currentEnemy.name} appears! ${this.currentEnemy.icon} (Recruit cost: 🪙${this.currentEnemy.cost})`);
+        }
+
+        getAlliedFighters() {
+            return [this.player, ...this.allies].filter(u => u.isAlive());
+        }
+
+        enemyTurn() {
+            if (!this.currentEnemy || !this.currentEnemy.isAlive()) return;
+            const targets = this.getAlliedFighters();
+            if (targets.length === 0) {
+                this.addLog("💀 Everyone is defeated! Game Over...");
+                this.endGame();
+                return;
+            }
+            this.currentEnemy.enemyAction(targets, (msg) => this.addLog(msg));
+        }
+
+        endGame() {
+            this.gameActive = false;
+            this.addLog("☠️ GAME OVER - Your journey has ended.");
+            this.addLog("✨ Click the RESTART button to begin a new adventure! ✨");
+            this.restartContainer.classList.remove("hidden");
+            this.updateAllUI();
+        }
+
+        winGame() {
+            this.gameActive = false;
+            this.addLog("🏆✨ VICTORY! You have reached 100% progress and become a legend! ✨🏆");
+            this.addLog("🎉 Press RESTART to embark on a new heroic journey! 🎉");
+            this.restartContainer.classList.remove("hidden");
+            this.updateAllUI();
+        }
+
+        checkCombatState() {
+            if (!this.player.isAlive()) {
+                this.endGame();
+                return true;
+            }
+
+            if (this.currentEnemy && !this.currentEnemy.isAlive()) {
+                const goldReward = 25 + Math.floor(Math.random() * 10);
+                const progressGain = 12;
+                this.gold += goldReward;
+                this.progress = Math.min(100, this.progress + progressGain);
+                this.addLog(`🏆 VICTORY! +${goldReward} gold, +${progressGain} progress!`);
+                this.player.regenMana(8);
+                this.addLog(`🔋 ${this.player.name} recovers 8 mana.`);
+                this.currentEnemy = null;
+                this.updateAllUI();
+                if (this.progress >= 100) {
+                    this.winGame();
+                }
+                return true;
+            }
+            return false;
+        }
+
+        resolveAction() {
+            if (!this.gameActive) return;
+            if (this.currentEnemy && this.currentEnemy.isAlive()) {
+                this.enemyTurn();
+            }
+            this.checkCombatState();
+            this.updateAllUI();
+        }
+
+        playerAttack() {
+            if (!this.gameActive) return;
+            if (!this.currentEnemy || !this.currentEnemy.isAlive()) {
+                this.addLog("No enemy to attack! Click 'Next Foe'.");
+                return;
+            }
+            this.player.basicAttack(this.currentEnemy, (msg) => this.addLog(msg));
+            this.resolveAction();
+        }
+
+        playerSkill() {
+            if (!this.gameActive) return;
+            if (!this.currentEnemy || !this.currentEnemy.isAlive()) {
+                this.addLog("No enemy to use skill!");
+                return;
+            }
+            const success = this.player.specialSkill(this.currentEnemy, (msg) => this.addLog(msg));
+            if (success) this.resolveAction();
+            else this.updateAllUI();
+        }
+
+        playerHeal() {
+            if (!this.gameActive) return;
+            if (!this.player.isAlive()) return;
+            this.player.selfHeal((msg) => this.addLog(msg));
+            this.resolveAction();
+        }
+
+        attemptRecruit() {
+            if (!this.gameActive) {
+                this.addLog("Game is over, click RESTART.");
+                return;
+            }
+            if (!this.currentEnemy) {
+                this.addLog("👻 No enemy to recruit! Click 'Next Foe' first.");
+                return;
+            }
+
+            if (typeof this.currentEnemy.cost !== 'number' || isNaN(this.currentEnemy.cost)) {
+                this.addLog("😕 This creature cannot be recruited.");
+                return;
+            }
+
+            const cost = this.currentEnemy.cost;
+            if (this.gold < cost) {
+                this.addLog(`💰 Not enough gold! Need ${cost} gold. You have ${this.gold}.`);
+                return;
+            }
+
+            this.gold -= cost;
+
+            let allyClassType = "Warrior";
+            const lowerName = this.currentEnemy.name.toLowerCase();
+            if (lowerName.includes("rogue") || lowerName.includes("elf") || lowerName.includes("shadow"))
+                allyClassType = "Rogue";
+            else if (lowerName.includes("mage") || lowerName.includes("elemental") || lowerName.includes("wraith"))
+                allyClassType = "Mage";
+            else
+                allyClassType = "Warrior";
+
+            const recruitedAlly = new PlayerUnit(allyClassType, this.currentEnemy.name);
+            // Allies come with full HP but balanced mana
+            recruitedAlly.mana = recruitedAlly.maxMana;
+            this.allies.push(recruitedAlly);
+            this.addLog(`🤝 SUCCESS! ${this.currentEnemy.name} ${this.currentEnemy.icon} joins your cause! (-${cost} gold)`);
+            this.addLog(`✨ ${recruitedAlly.name} (${recruitedAlly.classType}) stands with you!`);
+
+            this.currentEnemy = null;
+            this.updateAllUI();
+            this.addLog("⭐ The battlefield is clear. Press 'Next Foe' to continue.");
+        }
+
+        nextEncounter() {
+            if (!this.gameActive) {
+                this.addLog("Game over, click RESTART.");
+                return;
+            }
+            if (this.currentEnemy && this.currentEnemy.isAlive()) {
+                this.addLog("⚔️ You must defeat or recruit the current enemy before moving on!");
+                return;
+            }
+            this.spawnRandomEnemy();
+            this.player.regenMana(5);
+            // Also heal allies slightly between battles (minor bandage)
+            for (let ally of this.allies) {
+                if (ally.isAlive()) {
+                    let smallHeal = Math.floor(ally.maxHp * 0.1);
+                    ally.receiveHeal(smallHeal);
+                    this.addLog(`💚 ${ally.name} recovers ${smallHeal} HP between battles.`);
+                }
+            }
+            this.updateAllUI();
+            this.addLog("🌀 A new challenge emerges...");
+        }
+
+        updateAllUI() {
+            if (!this.player) return;
+
+            const playerHpPercent = this.player.getHealthPercent();
+            const manaPercent = (this.player.mana / this.player.maxMana) * 100;
+            const powerPercent = Math.min(100, (this.player.atk / 40) * 100);
+            const goldPercent = Math.min(100, (this.gold / 250) * 100);
+            const progPercent = this.progress;
+
+            this.playerStatsDiv.innerHTML = `
+                <div class="stat-block">
+                    <div class="stat-label">❤️ ${this.player.name} (${this.player.classType}) | ${this.player.hp}/${this.player.maxHp} HP</div>
+                    <div class="bar"><div class="fill hp" style="width: ${playerHpPercent}%;"></div></div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-label">✨ MANA: ${this.player.mana}/${this.player.maxMana}</div>
+                    <div class="bar"><div class="fill mana" style="width: ${manaPercent}%;"></div></div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-label">⚔️ POWER: ${this.player.atk}</div>
+                    <div class="bar"><div class="fill power" style="width: ${powerPercent}%;"></div></div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-label">🪙 GOLD: ${this.gold}</div>
+                    <div class="bar"><div class="fill gold" style="width: ${goldPercent}%;"></div></div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-label">📈 PROGRESS: ${this.progress}%</div>
+                    <div class="bar"><div class="fill progress" style="width: ${progPercent}%;"></div></div>
+                </div>
+            `;
+
+            if (this.allies.length === 0) {
+                this.alliesDiv.innerHTML = "<div style='opacity:0.7;'>— No allies recruited —<br>💰 Defeat & recruit monsters!</div>";
+            } else {
+                this.alliesDiv.innerHTML = this.allies.map(ally => `
+                    <div class="ally-badge">
+                        <span>⚔️ ${ally.name} (${ally.classType})</span>
+                        <span style="color:#ffaa88">❤️ ${ally.hp}/${ally.maxHp}</span>
+                    </div>
+                `).join('');
+            }
+
+            if (this.currentEnemy && this.currentEnemy.isAlive()) {
+                const enemyHpPercent = (this.currentEnemy.hp / this.currentEnemy.maxHp) * 100;
+                this.enemyDiv.innerHTML = `
+                    <div class="enemy-card">
+                        ${this.currentEnemy.getArtHTML()}
+                        <div class="enemy-stats">
+                            <strong>🐲 ${this.currentEnemy.name}</strong>
+                            <div class="bar" style="margin: 8px 0;"><div class="fill hp" style="width: ${enemyHpPercent}%; background:#e06c6c;"></div></div>
+                            <div>❤️ ${this.currentEnemy.hp}/${this.currentEnemy.maxHp} HP | ⚔️ ATK: ${this.currentEnemy.atk}</div>
+                            <div class="cost-badge">💰 Recruit cost: 🪙${this.currentEnemy.cost}</div>
+                        </div>
+                    </div>
+                `;
+            } else if (this.currentEnemy && !this.currentEnemy.isAlive()) {
+                this.enemyDiv.innerHTML = `<div style="background:#2e2a3a; border-radius:16px; padding:12px;">✅ Defeated! Press "Next Foe"</div>`;
+            } else {
+                this.enemyDiv.innerHTML = `<div style="background:#1f2538; border-radius:16px; padding:12px;">🌀 No enemy. Press "Next Foe" to continue.</div>`;
+            }
+        }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+        new DungeonGame();
+    });
+</script>
+</body>
+</html>
+```
