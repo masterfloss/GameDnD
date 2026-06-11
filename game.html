@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>⚔️ D&D RPG - Hero's Journey ⚔️</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="game-container">
+    <h1>⚔️ D&D: RECRUIT & CONQUER ⚔️</h1>
+
+    <!-- START SECTION -->
+    <div id="startScreen">
+        <div class="start-panel">
+            <h3>⚔️ Choose Your Class ⚔️</h3>
+            <select id="classSelect">
+                <option value="Warrior">🛡️ Warrior (Tank & Power)</option>
+                <option value="Rogue">🗡️ Rogue (Critical Strikes)</option>
+                <option value="Mage">🔮 Mage (Arcane Blast)</option>
+            </select>
+            <br>
+            <button id="startGameBtn">✨ Begin Adventure ✨</button>
+            <p style="font-size:12px; margin-top:20px;">⭐ Defeat enemies → earn gold & progress ⭐<br>💰 Recruit foes as allies using their cost! 💰</p>
+        </div>
+    </div>
+
+    <!-- MAIN GAME UI -->
+    <div id="gameInterface" class="hidden">
+        <div class="game-panel">
+            <div class="card">
+                <h3>🌟 HERO</h3>
+                <div id="playerStatsArea"></div>
+                <h3>⚔️ ALLIES (SQUAD)</h3>
+                <div id="alliesContainer" class="allies-list">— No allies yet —</div>
+            </div>
+
+            <div class="card">
+                <h3>🐉 CURRENT ENEMY</h3>
+                <div id="enemyArea"></div>
+                <div id="recruitMessage" style="margin-top: 12px;"></div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button id="btnAttack">⚔️ ATTACK</button>
+            <button id="btnSkill">✨ SKILL</button>
+            <button id="btnHeal">💚 HEAL</button>
+            <button id="btnRecruit">🤝 RECRUIT</button>
+            <button id="btnNext">➡️ NEXT FOE</button>
+        </div>
+
+        <div class="log" id="combatLog"></div>
+
+        <div id="restartContainer" class="hidden game-over-overlay">
+            <button id="restartButton" class="restart-btn">🔄 RESTART ADVENTURE 🔄</button>
+        </div>
+    </div>
+</div>
+
+<script src="enemies.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
